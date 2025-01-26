@@ -30,7 +30,7 @@ while (true)
     Board.DrawBoard();
     Board.Clear();
 
-    Thread.Sleep(700);
+    Thread.Sleep(200);
 
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
@@ -38,3 +38,6 @@ while (true)
         Console.BufferWidth = 200;
     } 
 }
+
+
+

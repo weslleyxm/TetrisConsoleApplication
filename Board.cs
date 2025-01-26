@@ -1,5 +1,5 @@
 ﻿namespace Tetris
-{ 
+{
     internal static class Board
     {
         private static int rows = 10;
@@ -12,8 +12,9 @@
         private static ConsoleColor currentColor = ConsoleColor.White;
 
         private static string bottonMap = string.Empty;
-        private static string topMap = string.Empty; 
+        private static string topMap = string.Empty;
 
+        private static int currentRotate;
         public static void Initialize()
         {
             board = new Cell[rows, columns];
@@ -26,21 +27,20 @@
                 }
             }
 
-            currentHorizontalPosition = rows / 2 -1;
+            currentHorizontalPosition = rows / 2 - 1;
             currentVerticalPosition = 0;
-
-            currentPiece = PeekRandomPiece();
-
+             
             bottonMap = $"└{new string('─', rows * 2)}┘";
             topMap = $"┌{new string('─', rows * 2)}┐";
         }
-         
+
         public static void Update()
         {
             if (currentPiece == null)
             {
                 lastCellsUpdated.Clear();
                 currentVerticalPosition = 0;
+                currentRotate = new Random().Next(0, 4);
                 currentPiece = PeekRandomPiece();
                 return;
             }
@@ -52,7 +52,7 @@
                 DrawPiece(currentHorizontalPosition, currentVerticalPosition, out fits);
             }
             else
-            { 
+            {
                 DrawPiece(currentHorizontalPosition, currentVerticalPosition - 1, out _);
 
                 lastCellsUpdated.Clear();
@@ -72,12 +72,12 @@
 
         private static void DrawPiece(int row, int column, out bool state)
         {
-            state = true; 
+            state = true;
             for (int x = 0; x < currentPiece?.GetLength(0); x++)
             {
                 for (int y = 0; y < currentPiece.GetLength(1); y++)
                 {
-                    if (currentPiece.Location[x, y] == 1)
+                    if (currentPiece.GetLocation(currentRotate)[x, y] == 1)
                     {
                         board[row + x, column + y].isOccupied = true;
                         board[row + x, column + y].foregroundColor = currentColor;
@@ -89,8 +89,8 @@
                             state = false;
                         }
                     }
-                } 
-            } 
+                }
+            }
         }
 
         public static bool CanMoveVertically(Piece piece)
@@ -99,7 +99,7 @@
             {
                 for (int y = 0; y < piece.GetLength(1); y++)
                 {
-                    if (piece.Location[x, y] == 1)
+                    if (piece.GetLocation(currentRotate)[x, y] == 1) 
                     {
                         if (board[currentHorizontalPosition + x, currentVerticalPosition + y].isOccupied)
                         {
@@ -142,15 +142,13 @@
                     {
                         Console.Write("  ");
                     }
-                } 
-                Console.Write("│"); 
+                }
+                Console.Write("│");
                 Console.WriteLine();
             }
             Console.WriteLine(bottonMap);
         }
-
-
-
+          
         private static Piece PeekRandomPiece()
         {
             currentColor = PeekRandomColor();

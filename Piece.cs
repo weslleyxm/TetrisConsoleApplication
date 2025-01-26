@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tetris
+﻿namespace Tetris
 {
     public class Piece
     {
-        public int[,] Location = new int[0, 0];
+        public bool RotateAllowed = true;
+        public List<int[,]> Location = new List<int[,]>();
 
-        public int GetLength(int dimension)
+        public int GetLength(int dimension, int index = 0)
         {
-            return Location.GetLength(dimension);
+            return Location[CorrectIndex(index)].GetLength(dimension);
         }
+
+        public int[,] GetLocation(int index = 0)
+        {
+            return Location[CorrectIndex(index)];
+        }
+
+        private int CorrectIndex(int index)
+        {
+            if (!RotateAllowed) return 0;
+            return index;
+        } 
     }
 }
