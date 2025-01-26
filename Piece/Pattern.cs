@@ -1,18 +1,18 @@
 ﻿namespace Tetris
 {
-    public class Piece
+    public class Pattern
     {
         public bool RotateAllowed = true;
-        public List<int[,]> Location = new List<int[,]>();
+        public List<int[,]> Shape = new List<int[,]>(); 
 
         public int GetLength(int dimension, int index = 0)
         {
-            return Location[CorrectIndex(index)].GetLength(dimension);
+            return Shape[CorrectIndex(index)].GetLength(dimension);
         }
 
-        public int[,] GetLocation(int index = 0)
+        public int[,] GetShape(int index = 0)
         {
-            return Location[CorrectIndex(index)];
+            return Shape[CorrectIndex(index)];
         }
 
         private int CorrectIndex(int index)

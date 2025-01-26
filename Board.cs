@@ -1,134 +1,47 @@
-﻿namespace Tetris
+﻿
+using System.Data.Common;
+using System.Runtime.InteropServices;
+
+namespace Tetris
 {
-    internal static class Board
+    public class Board : IBehaviour
     {
-        private static int rows = 10;
-        private static int columns = 20;
-        private static Cell[,] board = new Cell[0, 0];
-        private static int currentHorizontalPosition = 0;
-        private static int currentVerticalPosition = 0;
-        private static Piece? currentPiece;
-        private static List<Cell> lastCellsUpdated = new List<Cell>();
-        private static ConsoleColor currentColor = ConsoleColor.White;
+        public readonly int Rows = 10;
+        public readonly int Columns = 20;
 
-        private static string bottonMap = string.Empty;
-        private static string topMap = string.Empty;
+        private Cell[,] board = new Cell[0, 0];
 
-        private static int currentRotate;
-        public static void Initialize()
+        private string bottonMap = string.Empty;
+        private string topMap = string.Empty;
+
+        public Board()
         {
-            board = new Cell[rows, columns];
+            board = new Cell[Rows, Columns];
 
-            for (int x = 0; x < rows; x++)
+            for (int x = 0; x < Rows; x++)
             {
-                for (int y = 0; y < columns; y++)
+                for (int y = 0; y < Columns; y++)
                 {
                     board[x, y] = new Cell(x, y, ConsoleColor.White);
                 }
             }
 
-            currentHorizontalPosition = rows / 2 - 1;
-            currentVerticalPosition = 0;
-             
-            bottonMap = $"└{new string('─', rows * 2)}┘";
-            topMap = $"┌{new string('─', rows * 2)}┐";
+            Init();
         }
 
-        public static void Update()
+        public void Init()
         {
-            if (currentPiece == null)
-            {
-                lastCellsUpdated.Clear();
-                currentVerticalPosition = 0;
-                currentRotate = new Random().Next(0, 4);
-                currentPiece = PeekRandomPiece();
-                return;
-            }
-
-            bool fits = true;
-
-            if (CanMoveVertically(currentPiece))
-            {
-                DrawPiece(currentHorizontalPosition, currentVerticalPosition, out fits);
-            }
-            else
-            {
-                DrawPiece(currentHorizontalPosition, currentVerticalPosition - 1, out _);
-
-                lastCellsUpdated.Clear();
-                currentPiece = null;
-            }
-
-            if (fits)
-            {
-                currentVerticalPosition++;
-            }
-            else
-            {
-                lastCellsUpdated.Clear();
-                currentPiece = null;
-            }
+            bottonMap = $"└{new string('─', Rows * 2)}┘";
+            topMap = $"┌{new string('─', Rows * 2)}┐"; 
         }
 
-        private static void DrawPiece(int row, int column, out bool state)
-        {
-            state = true;
-            for (int x = 0; x < currentPiece?.GetLength(0); x++)
-            {
-                for (int y = 0; y < currentPiece.GetLength(1); y++)
-                {
-                    if (currentPiece.GetLocation(currentRotate)[x, y] == 1)
-                    {
-                        board[row + x, column + y].isOccupied = true;
-                        board[row + x, column + y].foregroundColor = currentColor;
-
-                        if ((column + y) <= columns - 2)
-                            lastCellsUpdated.Add(board[row + x, column + y]);
-                        else
-                        {
-                            state = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        public static bool CanMoveVertically(Piece piece)
-        {
-            for (int x = 0; x < piece.GetLength(0); x++)
-            {
-                for (int y = 0; y < piece.GetLength(1); y++)
-                {
-                    if (piece.GetLocation(currentRotate)[x, y] == 1) 
-                    {
-                        if (board[currentHorizontalPosition + x, currentVerticalPosition + y].isOccupied)
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        public static void Clear()
-        {
-            foreach (var item in lastCellsUpdated)
-            {
-                item.isOccupied = false;
-            }
-
-            lastCellsUpdated.Clear();
-        }
-
-        public static void DrawBoard()
+        public void Update()
         {
             Console.WriteLine(topMap);
-            for (int y = 0; y < columns; y++)
+            for (int y = 0; y < Columns; y++)
             {
                 Console.Write("│");
-                for (int x = 0; x < rows; x++)
+                for (int x = 0; x < Rows; x++)
                 {
                     var node = board[x, y];
 
@@ -148,26 +61,15 @@
             }
             Console.WriteLine(bottonMap);
         }
-          
-        private static Piece PeekRandomPiece()
+
+        public void Reset()
         {
-            currentColor = PeekRandomColor();
-            var random = new Random();
-            return Pieces.AllPieces[random.Next(0, Pieces.AllPieces.Count)];
+
         }
 
-        private static ConsoleColor PeekRandomColor()
+        public Cell GetCell(int x, int y)
         {
-            var colors = Enum.GetValues(typeof(ConsoleColor));
-            var random = new Random();
-            ConsoleColor randomColor = (ConsoleColor)(colors.GetValue(random.Next(colors.Length)) ?? ConsoleColor.White);
-
-            if (randomColor == ConsoleColor.Black)
-            {
-                randomColor = ConsoleColor.White;
-            }
-
-            return randomColor;
+            return board[x, y];
         }
     }
 }
